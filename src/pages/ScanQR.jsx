@@ -19,8 +19,10 @@ export default function ScanQR() {
   const [userData, setUserData] = useState(null);
   const [status, setStatus] = useState("Waiting to scan QR...");
   const [scannedData, setScannedData] = useState("");
-  const qrRef = useRef(null);
   const [cameraStarted, setCameraStarted] = useState(false);
+  const [cameraReady, setCameraReady] = useState(false);
+  const html5QrCodeRef = useRef(null);
+  const qrRegionId = "qr-region";
 
   // ✅ Fetch user info
   useEffect(() => {
@@ -37,47 +39,57 @@ export default function ScanQR() {
     return () => unsub();
   }, []);
 
-  // ✅ Initialize camera safely
-  useEffect(() => {
+  // ✅ Start camera when user clicks “Start Camera”
+  const startCamera = async () => {
     if (!user) return;
-    const qrRegionId = "qr-region";
     const html5QrCode = new Html5Qrcode(qrRegionId);
+    html5QrCodeRef.current = html5QrCode;
 
-    async function startScanner() {
-      try {
-        const devices = await Html5Qrcode.getCameras();
-        if (devices && devices.length) {
-          setCameraStarted(true);
-          await html5QrCode.start(
-            { facingMode: "environment" },
-            { fps: 10, qrbox: 250 },
-            handleScan,
-            handleError
-          );
-          qrRef.current = html5QrCode;
-        } else {
-          setStatus("❌ No camera detected. Try uploading an image instead.");
-        }
-      } catch (err) {
-        console.error("Camera start error:", err);
-        setStatus("⚠️ Please allow camera access in your browser.");
+    try {
+      const devices = await Html5Qrcode.getCameras();
+      if (devices && devices.length) {
+        setCameraStarted(true);
+        await html5QrCode.start(
+          { facingMode: "environment" },
+          { fps: 10, qrbox: calculateQrboxSize(), aspectRatio: 1.0 },
+          () => {} // No auto scanning callback
+        );
+        setCameraReady(true);
+        setStatus("Camera ready. Tap Scan Now to capture QR.");
+      } else {
+        setStatus("❌ No camera detected.");
       }
+    } catch (err) {
+      console.error("Camera error:", err);
+      setStatus("⚠️ Please allow camera access.");
     }
+  };
 
-    startScanner();
+  // ✅ Dynamically adjust qrbox for mobile
+  const calculateQrboxSize = () => {
+    const screenWidth = window.innerWidth;
+    return screenWidth < 600 ? screenWidth * 0.8 : 300;
+  };
 
-    return () => {
-      if (qrRef.current) {
-        qrRef.current.stop().catch(() => {});
-        qrRef.current.clear();
-      }
-    };
-  }, [user]);
+  // ✅ Manually trigger a scan
+  const handleManualScan = async () => {
+    if (!html5QrCodeRef.current) return;
+    setStatus("Scanning...");
+    try {
+      const qrResult = await html5QrCodeRef.current.scanOnce({
+        fps: 10,
+        qrbox: calculateQrboxSize(),
+      });
+      handleScan(qrResult.decodedText);
+    } catch (err) {
+      console.error("Scan failed:", err);
+      setStatus("❌ No QR detected. Try again.");
+    }
+  };
 
-  // ✅ Handle scanning logic
+  // ✅ Handle QR result + Firestore logic
   const handleScan = async (data) => {
     if (!data || !user || !userData) return;
-    qrRef.current?.stop(); // stop camera after successful scan
     setScannedData(data);
     setStatus("Processing QR...");
 
@@ -117,14 +129,11 @@ export default function ScanQR() {
 
       setUserData({ ...userData, balance: newBalance });
       setStatus("✅ Access Approved — Gate Opening!");
+      await html5QrCodeRef.current.stop();
     } catch (err) {
       console.error(err);
       setStatus("❌ Error verifying QR.");
     }
-  };
-
-  const handleError = (err) => {
-    console.warn("Scan error:", err);
   };
 
   // ✅ Image upload fallback
@@ -133,7 +142,7 @@ export default function ScanQR() {
     if (!file) return;
     setStatus("Scanning image...");
     try {
-      const html5QrCode = new Html5Qrcode("qr-region");
+      const html5QrCode = new Html5Qrcode(qrRegionId);
       const result = await html5QrCode.scanFile(file, true);
       handleScan(result);
     } catch (err) {
@@ -151,31 +160,49 @@ export default function ScanQR() {
       ) : (
         <>
           <div
-            id="qr-region"
-            className="w-full h-64 bg-black mb-4 rounded-xl"
+            id={qrRegionId}
+            className="relative mx-auto mb-4 rounded-xl bg-black overflow-hidden"
+            style={{
+              width: "100%",
+              maxWidth: "400px",
+              height: "auto",
+              aspectRatio: "1/1",
+            }}
           />
 
-          {!cameraStarted && (
-            <p className="text-yellow-400 text-sm mb-4">
-              Camera not started. You can upload a QR image instead.
-            </p>
+          {!cameraStarted ? (
+            <button
+              onClick={startCamera}
+              className="bg-blue-500 px-4 py-2 rounded-xl text-white font-medium hover:bg-blue-600"
+            >
+              Start Camera
+            </button>
+          ) : cameraReady ? (
+            <button
+              onClick={handleManualScan}
+              className="bg-green-500 px-4 py-2 rounded-xl text-white font-medium hover:bg-green-600"
+            >
+              Scan Now
+            </button>
+          ) : (
+            <p className="text-yellow-400">Starting camera...</p>
           )}
 
           <input
             type="file"
             accept="image/*"
             onChange={handleFileUpload}
-            className="block mx-auto mb-4 text-sm text-gray-400"
+            className="block mx-auto mt-4 text-sm text-gray-400"
           />
 
-          <p className="text-sm text-gray-400 mb-2">
+          <p className="text-sm text-gray-400 mt-3">
             {scannedData
               ? `Scanned: ${scannedData}`
               : "Align QR within the frame or upload image"}
           </p>
 
           <p
-            className={`text-lg ${
+            className={`text-lg mt-2 ${
               status.startsWith("✅")
                 ? "text-green-400"
                 : status.startsWith("❌")
