@@ -1,58 +1,22 @@
-import { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Send, CheckCircle } from "lucide-react";
 
 export default function Demo() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    organization: "",
-    message: "",
-  });
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formStatus, setFormStatus] = useState(null);
+  const formRef = useRef(null);
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+  const handleSubmit = () => {
+    setFormStatus("Thank you! We've received your demo request.");
+    if (formRef.current) {
+      setTimeout(() => formRef.current.reset(), 500);
+    }
   };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    setIsSubmitted(true);
-    setIsSubmitting(false);
-  };
-
-  if (isSubmitted) {
-    return (
-      <section
-        id="demo"
-        className="py-16 md:py-24 px-6 bg-gradient-to-br from-[#00D4AA]/10 to-[#00B4E5]/10"
-      >
-        <div className="max-w-[600px] mx-auto text-center">
-          <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle size={40} className="text-white" />
-          </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-black dark:text-white mb-4">
-            Thank You!
-          </h2>
-          <p className="text-gray-600 dark:text-[#B0B0B0] text-lg">
-            We've received your demo request. Our team will contact you within
-            24 hours to schedule your personalized demo.
-          </p>
-        </div>
-      </section>
-    );
-  }
 
   return (
-    <section id="demo" className="py-16 md:py-24 px-6">
+    <section
+      id="demo"
+      className="py-16 md:py-24 px-6 bg-gradient-to-br from-[#00D4AA]/10 to-[#00B4E5]/10"
+    >
       <div className="max-w-[1000px] mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left Column - Content */}
@@ -70,9 +34,7 @@ export default function Demo() {
 
             <p
               className="text-lg md:text-xl text-gray-600 dark:text-[#B0B0B0] leading-relaxed mb-8"
-              style={{
-                fontFamily: "Inter, system-ui, sans-serif",
-              }}
+              style={{ fontFamily: "Inter, system-ui, sans-serif" }}
             >
               Want to see how Smart Parking EV can transform your business or
               city? Request a live demo with our team.
@@ -97,18 +59,26 @@ export default function Demo() {
             </div>
           </div>
 
-          {/* Right Column - Form */}
+          {/* Right Column - Google Form */}
           <div className="bg-white dark:bg-[#1A1A1A] rounded-3xl p-8 md:p-10 shadow-xl border border-gray-200 dark:border-[#404040]">
             <h3
               className="text-2xl font-semibold text-black dark:text-white mb-6"
-              style={{
-                fontFamily: "Inter, system-ui, sans-serif",
-              }}
+              style={{ fontFamily: "Inter, system-ui, sans-serif" }}
             >
               Request Demo
             </h3>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Hidden iframe prevents redirect */}
+            <iframe name="hidden_iframe" style={{ display: "none" }}></iframe>
+
+            <form
+              ref={formRef}
+              action="https://docs.google.com/forms/d/e/1FAIpQLSciSrMGKYSvG-Vq6UUOabywfmPciWqeI1LiIUiHOSxyf0O-Mg/formResponse"
+              method="POST"
+              target="hidden_iframe"
+              onSubmit={handleSubmit}
+              className="space-y-6"
+            >
               <div>
                 <label
                   htmlFor="name"
@@ -119,10 +89,8 @@ export default function Demo() {
                 <input
                   type="text"
                   id="name"
-                  name="name"
+                  name="entry.1037798072" // Google Forms entry ID
                   required
-                  value={formData.name}
-                  onChange={handleChange}
                   className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-[#404040] bg-white dark:bg-[#2A2A2A] text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-[#00D4AA] focus:border-transparent"
                   placeholder="Your full name"
                 />
@@ -138,10 +106,8 @@ export default function Demo() {
                 <input
                   type="email"
                   id="email"
-                  name="email"
+                  name="entry.409289857" // Google Forms entry ID
                   required
-                  value={formData.email}
-                  onChange={handleChange}
                   className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-[#404040] bg-white dark:bg-[#2A2A2A] text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-[#00D4AA] focus:border-transparent"
                   placeholder="your.email@company.com"
                 />
@@ -157,9 +123,7 @@ export default function Demo() {
                 <input
                   type="text"
                   id="organization"
-                  name="organization"
-                  value={formData.organization}
-                  onChange={handleChange}
+                  name="entry.1131840717" // Replace with your Google Forms field ID
                   className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-[#404040] bg-white dark:bg-[#2A2A2A] text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-[#00D4AA] focus:border-transparent"
                   placeholder="Your company or organization"
                 />
@@ -174,10 +138,8 @@ export default function Demo() {
                 </label>
                 <textarea
                   id="message"
-                  name="message"
+                  name="entry.1710819350" // Google Forms entry ID
                   rows={4}
-                  value={formData.message}
-                  onChange={handleChange}
                   className="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-[#404040] bg-white dark:bg-[#2A2A2A] text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-[#00D4AA] focus:border-transparent resize-none"
                   placeholder="Tell us about your parking challenges or specific demo interests..."
                 />
@@ -185,22 +147,18 @@ export default function Demo() {
 
               <button
                 type="submit"
-                disabled={isSubmitting}
-                className="w-full flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-[#00D4AA] to-[#00B4E5] hover:from-[#00C299] hover:to-[#00A3D4] disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-all duration-150 hover:scale-105"
+                className="w-full flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-[#00D4AA] to-[#00B4E5] hover:from-[#00C299] hover:to-[#00A3D4] text-white font-semibold rounded-xl transition-all duration-150 hover:scale-105"
               >
-                {isSubmitting ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Submitting...
-                  </>
-                ) : (
-                  <>
-                    <Send size={20} />
-                    Request Demo
-                  </>
-                )}
+                <Send size={20} />
+                Request Demo
               </button>
             </form>
+
+            {formStatus && (
+              <p className="mt-6 text-lg text-center text-[#00D4AA] font-semibold flex items-center justify-center gap-2">
+                {formStatus}
+              </p>
+            )}
           </div>
         </div>
       </div>

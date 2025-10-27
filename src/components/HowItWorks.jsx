@@ -6,6 +6,7 @@ import {
   Smartphone,
   CheckCircle,
 } from "lucide-react";
+import { HashLink } from "react-router-hash-link";
 
 export default function HowItWorks() {
   const steps = [
@@ -75,7 +76,7 @@ export default function HowItWorks() {
                     <IconComponent size={32} className="text-white" />
                   </div>
 
-                  <div className="bg-white dark:bg-[#2A2A2A] w-50 h-40 rounded-2xl p-6 shadow-sm border border-gray-200 dark:border-[#404040]">
+                  <div className="bg-white dark:bg-[#2A2A2A] w-50 h-40 rounded-2xl p-6 shadow-sm border border-gray-200 dark:border-[#404040] md:h-44 mx-auto">
                     <div className="text-sm font-bold text-[#00D4AA] mb-2">
                       Step {index + 1}
                     </div>
@@ -94,13 +95,19 @@ export default function HowItWorks() {
 
         {/* CTA */}
         <div className="text-center mt-12">
-          <button className="group flex items-center gap-3 px-8 py-4 bg-black dark:bg-white text-white dark:text-black font-semibold rounded-2xl mx-auto hover:scale-105 transition-all duration-150">
-            <Play
-              size={20}
-              className="group-hover:scale-110 transition-transform"
-            />
-            Watch Demo Video
-          </button>
+          <HashLink
+            to="/#demovideo"
+            className="mb-4 text-lg text-[#00D4AA] hover:text-[#00B48F] transition-colors"
+          >
+            <br />
+            <button className="group flex items-center gap-3 px-8 py-4 bg-black dark:bg-white text-white dark:text-black font-semibold rounded-2xl mx-auto hover:scale-105 transition-all duration-150">
+              <Play
+                size={20}
+                className="group-hover:scale-110 transition-transform"
+              />
+              Watch Demo Video
+            </button>
+          </HashLink>
         </div>
       </div>
     </section>
