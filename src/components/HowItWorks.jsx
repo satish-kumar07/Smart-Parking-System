@@ -42,7 +42,7 @@ export default function HowItWorks() {
   ];
 
   return (
-    <section className="py-16 md:py-24 px-6">
+    <section className="py-16 md:py-24 px-6" id="howitworks">
       <div className="max-w-[1200px] mx-auto">
         <div className="text-center mb-12 md:mb-16">
           <h2

@@ -8,6 +8,11 @@ html{
   scroll-behavior: smooth;
 }
 
+html, body {
+  overflow-x: hidden;
+}
+
+
 /* App.css */
 .animated-gradient-background {
   background: linear-gradient(90deg, #000000, #585858, #898989); /* Initial gradient */

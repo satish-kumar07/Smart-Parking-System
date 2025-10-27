@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { HashLink } from "react-router-hash-link";
 import { Link } from "react-router-dom";
 import { auth, logout } from "../firebase";
 import { ChevronDown, Menu, X, Car } from "lucide-react";
@@ -16,14 +17,23 @@ export default function Header() {
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+    return () => (document.body.style.overflow = "auto");
+  }, [isMobileMenuOpen]);
+
   const menuItems = [
-    { name: "Home", href: "/" },
-    { name: "Solutions", href: "/solutions" },
-    { name: "Technology", href: "/technology" },
-    { name: "Sustainability", href: "/sustainability" },
-    { name: "Use Cases", href: "/usecases" },
-    { name: "About", href: "/about" },
-    { name: "Contact", href: "#footer" },
+    { name: "Home", to: "/#home" },
+    { name: "Solutions", to: "/#solutions" },
+    { name: "Technology", to: "/#technology" },
+    { name: "Sustainability", to: "/#sustainability" },
+    { name: "Use Cases", to: "/#usecases" },
+    { name: "About", to: "/#about" },
+    { name: "Contact", to: "/#footer" },
   ];
 
   return (
@@ -34,10 +44,10 @@ export default function Header() {
       />
 
       <header
-        className="text-white h-16 backdrop-blur md:h-16 px-6 sticky top-0 z-50 shadow-md"
+        className="text-white w-full h-16 backdrop-blur md:h-16 px-6 sticky top-0 z-50 shadow-md"
         style={{ fontFamily: "Instrument Sans, Inter, system-ui, sans-serif" }}
       >
-        <div className="w-full mx-auto flex items-center justify-between h-full">
+        <div className="mx-auto flex items-center justify-between h-full">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-gradient-to-br from-[#00D4AA] to-[#00B4E5] rounded-lg flex items-center justify-center">
@@ -50,24 +60,41 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            {menuItems.map((item) => (
-              <Link
-                key={item.name}
-                to={item.href}
-                className="group flex items-center space-x-1 text-white opacity-90 hover:opacity-100 hover:text-[#00D4AA] transition-colors duration-150 font-medium text-base focus:outline-none focus:ring-2 focus:ring-[#00D4AA] focus:ring-offset-2 focus:ring-offset-[#0A0A0B] rounded-lg px-2 py-1"
-              >
-                <span>{item.name}</span>
-                {item.name !== "Contact" && (
-                  <ChevronDown
-                    size={12}
-                    className="transition-transform duration-150 group-hover:rotate-180"
-                  />
-                )}
-              </Link>
-            ))}
+            {menuItems.map((item) =>
+              item.to.includes("#") ? (
+                <HashLink
+                  smooth
+                  key={item.name}
+                  to={item.to}
+                  className="group flex items-center space-x-1 text-white opacity-90 hover:opacity-100 hover:text-[#00D4AA] transition-colors duration-150 font-medium text-base focus:outline-none focus:ring-2 focus:ring-[#00D4AA] focus:ring-offset-2 focus:ring-offset-[#0A0A0B] rounded-lg px-2 py-1"
+                >
+                  <span>{item.name}</span>
+                  {item.name !== "Contact" && (
+                    <ChevronDown
+                      size={12}
+                      className="transition-transform duration-150 group-hover:rotate-180"
+                    />
+                  )}
+                </HashLink>
+              ) : (
+                <Link
+                  key={item.name}
+                  to={item.to}
+                  className="group flex items-center space-x-1 text-white opacity-90 hover:opacity-100 hover:text-[#00D4AA] transition-colors duration-150 font-medium text-base focus:outline-none focus:ring-2 focus:ring-[#00D4AA] focus:ring-offset-2 focus:ring-offset-[#0A0A0B] rounded-lg px-2 py-1"
+                >
+                  <span>{item.name}</span>
+                  {item.name !== "Contact" && (
+                    <ChevronDown
+                      size={12}
+                      className="transition-transform duration-150 group-hover:rotate-180"
+                    />
+                  )}
+                </Link>
+              )
+            )}
           </nav>
 
-          {/* Desktop Action Buttons */}
+          {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center space-x-4 ">
             {user ? (
               <div className="flex flex-row items-center gap-4">
@@ -90,7 +117,6 @@ export default function Header() {
                     boxShadow: "0 10px 25px rgba(0, 212, 170, 0.3)",
                   }}
                 >
-                  {" "}
                   <IoMdLogIn size={18} />
                   <span>Logout</span>
                 </button>
@@ -122,9 +148,9 @@ export default function Header() {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden fixed inset-0 bg-[#0A0A0B] z-50 flex flex-col">
+          <div className="md:hidden fixed inset-0 bg-[#0A0A0B] z-50 flex flex-col h-screen overflow-hidden">
             {/* Mobile Header */}
-            <div className="flex items-center justify-between h-14 px-6 border-b border-[#333333]">
+            <div className="flex items-center justify-between h-14 px-6 border-b border-[#333333] flex-shrink-0">
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 bg-gradient-to-br from-[#00D4AA] to-[#00B4E5] rounded-lg flex items-center justify-center">
                   <Car size={20} className="text-white" />
@@ -142,32 +168,45 @@ export default function Header() {
               </button>
             </div>
 
-            {/* Mobile Navigation */}
-            <nav className="flex-1 px-6 py-6 space-y-4">
-              {menuItems.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className="flex items-center justify-between py-3 text-white opacity-90 hover:opacity-100 hover:text-[#00D4AA] transition-colors duration-150 font-medium text-base border-b border-[#333333] last:border-b-0"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <span>{item.name}</span>
-                  {item.name !== "Contact" && <ChevronDown size={12} />}
-                </Link>
-              ))}
-            </nav>
+            {/* ✅ Scrollable Menu Content */}
+            <div className="flex-1 overflow-y-auto px-6 py-6 space-y-4">
+              {menuItems.map((item) =>
+                item.to.includes("#") ? (
+                  <HashLink
+                    smooth
+                    key={item.name}
+                    to={item.to}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center justify-between py-3 text-white opacity-90 hover:opacity-100 hover:text-[#00D4AA] transition-colors duration-150 font-medium text-base border-b border-[#333333] last:border-b-0"
+                  >
+                    <span>{item.name}</span>
+                    {item.name !== "Contact" && <ChevronDown size={12} />}
+                  </HashLink>
+                ) : (
+                  <Link
+                    key={item.name}
+                    to={item.to}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center justify-between py-3 text-white opacity-90 hover:opacity-100 hover:text-[#00D4AA] transition-colors duration-150 font-medium text-base border-b border-[#333333] last:border-b-0"
+                  >
+                    <span>{item.name}</span>
+                    {item.name !== "Contact" && <ChevronDown size={12} />}
+                  </Link>
+                )
+              )}
+            </div>
 
-            {/* Mobile Auth Buttons */}
-            <div className="px-6 py-6 space-y-3 border-t border-[#333333]">
+            {/* Auth Buttons */}
+            <div className="px-6 py-6 space-y-3 border-t border-[#333333] flex-shrink-0">
               {user ? (
                 <Link
                   to="/profile"
-                  className="px-8 py-4 rounded-2xl text-white font-semibold text-[15px] transition-all duration-150 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#00D4AA] focus:ring-offset-2 focus:ring-offset-[#0A0A0B]"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-2xl text-white font-semibold text-[15px] transition-all duration-150 hover:scale-105"
                   style={{
                     background: "linear-gradient(135deg, #00D4AA, #00B4E5)",
                     boxShadow: "0 10px 25px rgba(0, 212, 170, 0.3)",
                   }}
-                  onClick={() => setIsMobileMenuOpen(false)}
                 >
                   <FaRegUserCircle size={18} />
                   <span>Profile</span>
@@ -175,12 +214,12 @@ export default function Header() {
               ) : (
                 <Link
                   to="/profile"
-                  className="px-8 py-4 rounded-2xl text-white font-semibold text-[15px] transition-all duration-150 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#00D4AA] focus:ring-offset-2 focus:ring-offset-[#0A0A0B]"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-2xl text-white font-semibold text-[15px] transition-all duration-150 hover:scale-105"
                   style={{
                     background: "linear-gradient(135deg, #00D4AA, #00B4E5)",
                     boxShadow: "0 10px 25px rgba(0, 212, 170, 0.3)",
                   }}
-                  onClick={() => setIsMobileMenuOpen(false)}
                 >
                   <IoMdLogIn size={18} />
                   <span>Login</span>

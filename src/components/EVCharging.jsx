@@ -8,7 +8,7 @@ export default function EVCharging() {
         rel="stylesheet"
       />
 
-      <section className="py-16 md:py-24 px-6 text-white">
+      <section className="py-16 md:py-24 px-6 text-white" id="evcharging">
         <div className="max-w-[1200px] mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             {/* Left Column - Content */}

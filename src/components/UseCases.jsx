@@ -29,7 +29,7 @@ export default function UseCases() {
   ];
 
   return (
-    <section id="use-cases" className="py-16 md:py-24 px-6">
+    <section id="usecases" className="py-16 md:py-24 px-6">
       <div className="max-w-[1200px] mx-auto">
         <div className="text-center mb-12 md:mb-16">
           <h2

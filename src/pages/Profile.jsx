@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  auth,
-  db,
-  loginWithGoogle,
-  logout,
-  updateVehicleInfo,
-} from "../firebase";
+import { auth, db, loginWithGoogle, logout } from "../firebase";
 import {
   doc,
   getDoc,
@@ -49,8 +43,7 @@ export default function Profile() {
   const [transactions, setTransactions] = useState([]);
   const [form, setForm] = useState({
     phone: "",
-    carNumbers: [""],
-    vehicleType: "2-wheeler",
+    vehicles: [{ number: "", type: "2-wheeler" }],
   });
 
   // 🔐 Auth listener + ensure Firestore doc
@@ -69,8 +62,7 @@ export default function Profile() {
             name: currentUser.displayName,
             email: currentUser.email,
             phone: "",
-            carNumbers: [],
-            vehicleType: "2-wheeler",
+            vehicles: [],
             balance: 0,
             createdAt: serverTimestamp(),
             lastLogin: serverTimestamp(),
@@ -84,8 +76,10 @@ export default function Profile() {
             setUserData(data);
             setForm({
               phone: data.phone || "",
-              carNumbers: data.carNumbers?.length ? data.carNumbers : [""],
-              vehicleType: data.vehicleType || "2-wheeler",
+              vehicles:
+                data.vehicles?.length > 0
+                  ? data.vehicles
+                  : [{ number: "", type: "2-wheeler" }],
             });
           }
         });
@@ -139,9 +133,9 @@ export default function Profile() {
   // 💾 Save changes
   const handleSave = async () => {
     try {
-      await updateVehicleInfo(user.uid, form.carNumbers, form.vehicleType);
       await updateDoc(doc(db, "users", user.uid), {
         phone: form.phone,
+        vehicles: form.vehicles,
         updatedAt: serverTimestamp(),
       });
       setIsEditing(false);
@@ -168,42 +162,47 @@ export default function Profile() {
           className="border border-gray-700 bg-transparent p-2 rounded text-white"
         />
 
-        <label className="font-medium">Car Number Plates:</label>
-        {form.carNumbers.map((car, idx) => (
-          <input
-            key={idx}
-            type="text"
-            placeholder={`Car ${idx + 1}`}
-            value={car}
-            onChange={(e) => {
-              const newCars = [...form.carNumbers];
-              newCars[idx] = e.target.value;
-              setForm({ ...form, carNumbers: newCars });
-            }}
-            className="border border-gray-700 bg-transparent p-2 rounded mb-1 text-white"
-          />
+        <label className="font-medium">Vehicles:</label>
+        {form.vehicles.map((v, idx) => (
+          <div key={idx} className="flex items-center gap-2 mb-1">
+            <input
+              type="text"
+              placeholder={`Vehicle ${idx + 1} Number`}
+              value={v.number}
+              onChange={(e) => {
+                const newVehicles = [...form.vehicles];
+                newVehicles[idx].number = e.target.value;
+                setForm({ ...form, vehicles: newVehicles });
+              }}
+              className="border border-gray-700 bg-transparent p-2 rounded flex-1 text-white"
+            />
+            <select
+              value={v.type}
+              onChange={(e) => {
+                const newVehicles = [...form.vehicles];
+                newVehicles[idx].type = e.target.value;
+                setForm({ ...form, vehicles: newVehicles });
+              }}
+              className="border border-gray-700 bg-transparent p-2 rounded text-white"
+            >
+              <option value="2-wheeler">2 Wheeler</option>
+              <option value="3-wheeler">3 Wheeler</option>
+              <option value="4-wheeler">4 Wheeler</option>
+            </select>
+          </div>
         ))}
 
         <button
           onClick={() =>
-            setForm({ ...form, carNumbers: [...form.carNumbers, ""] })
+            setForm({
+              ...form,
+              vehicles: [...form.vehicles, { number: "", type: "2-wheeler" }],
+            })
           }
           className="underline text-sm"
         >
-          + Add another car
+          + Add another vehicle
         </button>
-
-        <label className="font-medium">Vehicle Type:</label>
-        <select
-          name="vehicleType"
-          value={form.vehicleType}
-          onChange={(e) => setForm({ ...form, vehicleType: e.target.value })}
-          className="border border-gray-700 bg-transparent p-2 rounded text-white"
-        >
-          <option value="2-wheeler">2 Wheeler</option>
-          <option value="3-wheeler">3 Wheeler</option>
-          <option value="4-wheeler">4 Wheeler</option>
-        </select>
 
         <button
           onClick={() => loginWithGoogle(form)}
@@ -251,7 +250,7 @@ export default function Profile() {
             <strong>Email:</strong> {userData?.email}
           </div>
           <div>
-            <strong>Balance:</strong> {userData?.balance}
+            <strong>Balance:</strong> ₹{userData?.balance || 0}
           </div>
           <div>
             <strong>Phone:</strong>{" "}
@@ -267,58 +266,60 @@ export default function Profile() {
             )}
           </div>
 
+          {/* 🚗 Vehicles */}
           <div>
-            <strong>Vehicle Type:</strong>{" "}
+            <strong>Vehicles:</strong>
             {isEditing ? (
-              <select
-                value={form.vehicleType}
-                onChange={(e) =>
-                  setForm({ ...form, vehicleType: e.target.value })
-                }
-                className="border bg-transparent border-gray-700 p-1 rounded"
-              >
-                <option value="2-wheeler">2 Wheeler</option>
-                <option value="3-wheeler">3 Wheeler</option>
-                <option value="4-wheeler">4 Wheeler</option>
-              </select>
-            ) : (
-              userData?.vehicleType || "-"
-            )}
-          </div>
-
-          <div>
-            <strong>Car Numbers:</strong>
-            {isEditing ? (
-              <div className="flex flex-col gap-1 mt-1">
-                {form.carNumbers.map((car, idx) => (
-                  <input
-                    key={idx}
-                    value={car}
-                    onChange={(e) => {
-                      const newCars = [...form.carNumbers];
-                      newCars[idx] = e.target.value;
-                      setForm({ ...form, carNumbers: newCars });
-                    }}
-                    className="border bg-transparent border-gray-700 p-1 rounded"
-                    placeholder={`Car ${idx + 1}`}
-                  />
+              <div className="flex flex-col gap-2 mt-1">
+                {form.vehicles.map((v, idx) => (
+                  <div key={idx} className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      placeholder={`Vehicle ${idx + 1} Number`}
+                      value={v.number}
+                      onChange={(e) => {
+                        const newVehicles = [...form.vehicles];
+                        newVehicles[idx].number = e.target.value;
+                        setForm({ ...form, vehicles: newVehicles });
+                      }}
+                      className="border bg-transparent border-gray-700 p-1 rounded flex-1"
+                    />
+                    <select
+                      value={v.type}
+                      onChange={(e) => {
+                        const newVehicles = [...form.vehicles];
+                        newVehicles[idx].type = e.target.value;
+                        setForm({ ...form, vehicles: newVehicles });
+                      }}
+                      className="border bg-transparent border-gray-700 p-1 rounded"
+                    >
+                      <option value="2-wheeler">2 Wheeler</option>
+                      <option value="3-wheeler">3 Wheeler</option>
+                      <option value="4-wheeler">4 Wheeler</option>
+                    </select>
+                  </div>
                 ))}
                 <button
                   onClick={() =>
                     setForm({
                       ...form,
-                      carNumbers: [...form.carNumbers, ""],
+                      vehicles: [
+                        ...form.vehicles,
+                        { number: "", type: "2-wheeler" },
+                      ],
                     })
                   }
                   className="underline text-sm text-[#00D4AA]"
                 >
-                  + Add another car
+                  + Add another vehicle
                 </button>
               </div>
             ) : (
-              <ul className="list-disc list-inside">
-                {userData?.carNumbers?.map((c, i) => (
-                  <li key={i}>{c}</li>
+              <ul className="list-disc list-inside mt-1">
+                {userData?.vehicles?.map((v, i) => (
+                  <li key={i}>
+                    {v.number} — <span className="text-gray-400">{v.type}</span>
+                  </li>
                 ))}
               </ul>
             )}

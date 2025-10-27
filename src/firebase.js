@@ -16,6 +16,7 @@ import {
   serverTimestamp,
   increment,
 } from "firebase/firestore";
+import { getDatabase, ref, onValue, set, update } from "firebase/database"; // ✅ Add this line
 
 // ✅ Firebase Config
 const firebaseConfig = {
@@ -33,6 +34,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 const db = getFirestore(app);
+const rtdb = getDatabase(app);
 
 /* ======================================================
    👤 USER AUTHENTICATION & FIRESTORE USER MANAGEMENT
@@ -185,4 +187,4 @@ export const unbookSlot = async (lotId, slotId) => {
 /* ======================================================
    🧩 EXPORT FIREBASE INSTANCES
    ====================================================== */
-export { auth, provider, db };
+export { auth, provider, db, rtdb, ref, onValue, set, update };

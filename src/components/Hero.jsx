@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Play, Car, Zap, Cpu } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function Hero() {
   const [animationVisible, setAnimationVisible] = useState(false);
@@ -77,15 +78,17 @@ export default function Hero() {
                 </span>
               </button>
 
-              <button
-                className="px-8 py-4 rounded-2xl text-white font-semibold text-[15px] transition-all duration-150 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#00D4AA] focus:ring-offset-2 focus:ring-offset-[#0A0A0B]"
-                style={{
-                  background: "linear-gradient(135deg, #00D4AA, #00B4E5)",
-                  boxShadow: "0 10px 25px rgba(0, 212, 170, 0.3)",
-                }}
-              >
-                Get a Demo
-              </button>
+              <Link to={"/slot"}>
+                <button
+                  className="px-8 py-4 rounded-2xl text-white font-semibold text-[15px] transition-all duration-150 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#00D4AA] focus:ring-offset-2 focus:ring-offset-[#0A0A0B]"
+                  style={{
+                    background: "linear-gradient(135deg, #00D4AA, #00B4E5)",
+                    boxShadow: "0 10px 25px rgba(0, 212, 170, 0.3)",
+                  }}
+                >
+                  Book Slot
+                </button>
+              </Link>
             </div>
           </div>
 

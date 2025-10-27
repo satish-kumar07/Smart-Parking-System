@@ -34,6 +34,7 @@ export default function Footer() {
       />
 
       <footer
+        id="footer"
         className="text-white py-16 px-6"
         style={{ fontFamily: "Inter, system-ui, sans-serif" }}
       >

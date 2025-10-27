@@ -7,7 +7,6 @@ import HowItWorks from "../components/HowItWorks";
 import UseCases from "../components/UseCases";
 import About from "../components/About";
 import Demo from "../components/Demo";
-import Footer from "../components/Footer";
 
 const Home = () => {
   return (
@@ -20,7 +19,6 @@ const Home = () => {
       <UseCases />
       <About />
       <Demo />
-      <Footer id="footer" />
     </div>
   );
 };

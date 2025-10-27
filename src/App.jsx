@@ -7,6 +7,9 @@ import Profile from "./pages/Profile";
 import { db } from "./firebase";
 import { collection, getDocs } from "firebase/firestore";
 import SelectSlot from "./pages/SelectSlot";
+import Footer from "./components/Footer";
+import ScanQR from "./pages/ScanQR";
+import GenerateQRCodes from "./pages/GenerateQRCodes";
 // import { AnimatedBackground } from "animated-backgrounds";
 
 function App() {
@@ -32,7 +35,10 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/slot" element={<SelectSlot />} />
+          <Route path="/scan" element={<ScanQR />} />
+          <Route path="/generateqr" element={<GenerateQRCodes />} />
         </Routes>
+        <Footer />
       </Router>
     </div>
   );
