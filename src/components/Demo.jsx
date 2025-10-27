@@ -13,10 +13,7 @@ export default function Demo() {
   };
 
   return (
-    <section
-      id="demo"
-      className="py-16 md:py-24 px-6 bg-gradient-to-br from-[#00D4AA]/10 to-[#00B4E5]/10"
-    >
+    <section id="demo" className="py-16 md:py-24 px-6">
       <div className="max-w-[1000px] mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left Column - Content */}
