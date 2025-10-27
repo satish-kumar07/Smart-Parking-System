@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Play, Car, Zap, Cpu } from "lucide-react";
 import { Link } from "react-router-dom";
+import { HashLink } from "react-router-hash-link";
 
 export default function Hero() {
   const [animationVisible, setAnimationVisible] = useState(false);
@@ -66,7 +67,22 @@ export default function Hero() {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-20">
-              <button className="group flex items-center gap-3 px-8 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl hover:bg-white/20 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#00D4AA] focus:ring-offset-2 focus:ring-offset-[#0A0A0B]">
+              <Link to={"/slot"}>
+                <button
+                  className="px-8 py-4 rounded-2xl text-white font-semibold text-[15px] transition-all duration-150 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#00D4AA] focus:ring-offset-2 focus:ring-offset-[#0A0A0B]"
+                  style={{
+                    background: "linear-gradient(135deg, #00D4AA, #00B4E5)",
+                    boxShadow: "0 10px 25px rgba(0, 212, 170, 0.3)",
+                  }}
+                >
+                  Slot Status
+                </button>
+              </Link>
+              <HashLink
+                smooth
+                to="/#demovideo"
+                className="group flex items-center gap-3 px-8 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl hover:bg-white/20 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#00D4AA] focus:ring-offset-2 focus:ring-offset-[#0A0A0B]"
+              >
                 <div className="flex items-center justify-center w-6 h-6 border border-white/30 rounded-full">
                   <Play
                     size={10}
@@ -76,9 +92,9 @@ export default function Hero() {
                 <span className="text-white font-semibold text-[15px]">
                   Watch How It Works
                 </span>
-              </button>
+              </HashLink>
 
-              <Link to={"/slot"}>
+              <Link to={"/scan"}>
                 <button
                   className="px-8 py-4 rounded-2xl text-white font-semibold text-[15px] transition-all duration-150 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[#00D4AA] focus:ring-offset-2 focus:ring-offset-[#0A0A0B]"
                   style={{

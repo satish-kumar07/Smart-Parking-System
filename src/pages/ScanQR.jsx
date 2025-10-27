@@ -3,7 +3,7 @@ import { Html5Qrcode } from "html5-qrcode";
 import { auth, db } from "../firebase";
 import {
   doc,
-  getDoc,
+  onSnapshot,
   updateDoc,
   collection,
   addDoc,
@@ -20,42 +20,47 @@ export default function ScanQR() {
   const [status, setStatus] = useState("Waiting to scan QR...");
   const [scannedData, setScannedData] = useState("");
   const [cameraStarted, setCameraStarted] = useState(false);
-  const [cameraReady, setCameraReady] = useState(false);
-  const html5QrCodeRef = useRef(null);
+  const qrRef = useRef(null);
   const qrRegionId = "qr-region";
 
-  // ✅ Fetch user info
+  // ✅ Live user listener
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, async (currentUser) => {
+    const unsubAuth = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
-        const snap = await getDoc(doc(db, "users", currentUser.uid));
-        if (snap.exists()) setUserData(snap.data());
+        const unsubUser = onSnapshot(
+          doc(db, "users", currentUser.uid),
+          (snap) => {
+            if (snap.exists()) setUserData(snap.data());
+          }
+        );
+        return () => unsubUser();
       } else {
         setUser(null);
         setUserData(null);
       }
     });
-    return () => unsub();
+    return () => unsubAuth();
   }, []);
 
-  // ✅ Start camera when user clicks “Start Camera”
+  // ✅ Start camera
   const startCamera = async () => {
     if (!user) return;
     const html5QrCode = new Html5Qrcode(qrRegionId);
-    html5QrCodeRef.current = html5QrCode;
+    qrRef.current = html5QrCode;
+    setStatus("Starting camera...");
 
     try {
       const devices = await Html5Qrcode.getCameras();
       if (devices && devices.length) {
-        setCameraStarted(true);
         await html5QrCode.start(
           { facingMode: "environment" },
-          { fps: 10, qrbox: calculateQrboxSize(), aspectRatio: 1.0 },
-          () => {} // No auto scanning callback
+          { fps: 10, qrbox: calculateQrboxSize() },
+          handleScan,
+          (err) => console.warn("Scan error:", err)
         );
-        setCameraReady(true);
-        setStatus("Camera ready. Tap Scan Now to capture QR.");
+        setCameraStarted(true);
+        setStatus("Camera ready — align QR in frame.");
       } else {
         setStatus("❌ No camera detected.");
       }
@@ -65,33 +70,17 @@ export default function ScanQR() {
     }
   };
 
-  // ✅ Dynamically adjust qrbox for mobile
   const calculateQrboxSize = () => {
-    const screenWidth = window.innerWidth;
-    return screenWidth < 600 ? screenWidth * 0.8 : 300;
+    const width = window.innerWidth;
+    return width < 600 ? width * 0.8 : 300;
   };
 
-  // ✅ Manually trigger a scan
-  const handleManualScan = async () => {
-    if (!html5QrCodeRef.current) return;
-    setStatus("Scanning...");
-    try {
-      const qrResult = await html5QrCodeRef.current.scanOnce({
-        fps: 10,
-        qrbox: calculateQrboxSize(),
-      });
-      handleScan(qrResult.decodedText);
-    } catch (err) {
-      console.error("Scan failed:", err);
-      setStatus("❌ No QR detected. Try again.");
-    }
-  };
-
-  // ✅ Handle QR result + Firestore logic
+  // ✅ Handle QR result
   const handleScan = async (data) => {
     if (!data || !user || !userData) return;
     setScannedData(data);
     setStatus("Processing QR...");
+    qrRef.current?.stop().catch(() => {});
 
     try {
       let lotInfo;
@@ -127,9 +116,7 @@ export default function ScanQR() {
         timestamp: serverTimestamp(),
       });
 
-      setUserData({ ...userData, balance: newBalance });
       setStatus("✅ Access Approved — Gate Opening!");
-      await html5QrCodeRef.current.stop();
     } catch (err) {
       console.error(err);
       setStatus("❌ Error verifying QR.");
@@ -143,8 +130,8 @@ export default function ScanQR() {
     setStatus("Scanning image...");
     try {
       const html5QrCode = new Html5Qrcode(qrRegionId);
-      const result = await html5QrCode.scanFile(file, true);
-      handleScan(result);
+      const result = await html5QrCode.scanFileV2(file, true);
+      handleScan(result.decodedText);
     } catch (err) {
       console.error("Image scan failed:", err);
       setStatus("❌ Could not read QR from image.");
@@ -165,7 +152,6 @@ export default function ScanQR() {
             style={{
               width: "100%",
               maxWidth: "400px",
-              height: "auto",
               aspectRatio: "1/1",
             }}
           />
@@ -177,15 +163,13 @@ export default function ScanQR() {
             >
               Start Camera
             </button>
-          ) : cameraReady ? (
-            <button
-              onClick={handleManualScan}
-              className="bg-green-500 px-4 py-2 rounded-xl text-white font-medium hover:bg-green-600"
-            >
-              Scan Now
-            </button>
           ) : (
-            <p className="text-yellow-400">Starting camera...</p>
+            <button
+              onClick={() => qrRef.current?.stop()}
+              className="bg-gray-500 px-4 py-2 rounded-xl text-white font-medium hover:bg-gray-600"
+            >
+              Stop Camera
+            </button>
           )}
 
           <input

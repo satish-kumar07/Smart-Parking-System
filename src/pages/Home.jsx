@@ -7,11 +7,13 @@ import HowItWorks from "../components/HowItWorks";
 import UseCases from "../components/UseCases";
 import About from "../components/About";
 import Demo from "../components/Demo";
+import DemoVideo from "../components/DemoVideo";
 
 const Home = () => {
   return (
     <div className="w-full">
       <Hero />
+      <DemoVideo />
       <Solutions />
       <Technology />
       <EVCharging />

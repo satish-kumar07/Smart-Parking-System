@@ -6,9 +6,10 @@ import {
   setDoc,
   updateDoc,
   collection,
-  getDocs,
   onSnapshot,
   serverTimestamp,
+  query,
+  orderBy,
 } from "firebase/firestore";
 import { FaEdit, FaCarAlt, FaSignOutAlt } from "react-icons/fa";
 import { IoMdLogIn } from "react-icons/io";
@@ -46,12 +47,11 @@ export default function Profile() {
     vehicles: [{ number: "", type: "2-wheeler" }],
   });
 
-  // 🔐 Auth listener + ensure Firestore doc
+  // 🔐 Auth listener + realtime Firestore updates
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
-
         const userRef = doc(db, "users", currentUser.uid);
         const snap = await getDoc(userRef);
 
@@ -69,7 +69,7 @@ export default function Profile() {
           });
         }
 
-        // 👂 Realtime updates
+        // 👂 Realtime user updates
         const unsubUser = onSnapshot(userRef, (docSnap) => {
           const data = docSnap.data();
           if (data) {
@@ -84,23 +84,30 @@ export default function Profile() {
           }
         });
 
-        // 🧾 Transactions (optional)
+        // 🧾 Realtime transactions, newest first
         const txRef = collection(db, "users", currentUser.uid, "transactions");
-        const txSnap = await getDocs(txRef);
-        const txList = txSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
-        setTransactions(txList);
+        const q = query(txRef, orderBy("timestamp", "desc"));
+        const unsubTx = onSnapshot(q, (txSnap) => {
+          const txList = txSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+          setTransactions(txList);
+        });
 
-        return () => unsubUser();
+        // 🔥 Cleanup on unmount
+        return () => {
+          unsubUser();
+          unsubTx();
+        };
       } else {
         setUser(null);
         setUserData(null);
+        setTransactions([]);
       }
     });
 
     return () => unsubscribe();
   }, []);
 
-  // 🧭 Fetch nearest parking lot (only when user clicks)
+  // 🧭 Fetch nearest parking lot
   const handleFindNearest = () => {
     if (!navigator.geolocation) {
       alert("Geolocation not supported in your browser.");
@@ -146,8 +153,8 @@ export default function Profile() {
     }
   };
 
+  // 🔑 Login screen
   if (!user) {
-    // 🔑 Login screen
     return (
       <div className="flex flex-col gap-3 p-6 max-w-md mx-auto text-white shadow-md rounded-2xl min-h-screen justify-center">
         <h2 className="text-2xl font-bold text-center mb-2">
@@ -383,7 +390,11 @@ export default function Profile() {
                 className="border border-gray-800 rounded-lg p-3 text-sm flex justify-between"
               >
                 <span>{tx.description || "Parking Session"}</span>
-                <span className="text-[#00D4AA]">
+                <span
+                  className={`${
+                    tx.amount < 0 ? "text-red-400" : "text-green-400"
+                  }`}
+                >
                   ₹{tx.amount} – {tx.date}
                 </span>
               </li>

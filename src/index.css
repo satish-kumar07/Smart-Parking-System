@@ -12,7 +12,7 @@
   transform: scale(0.90);
   animation: fadeIn 0.8s ease-in-out forwards;
   transition: box-shadow 0.6s ease-in-out;
-  box-shadow: 0 0 30px #1eda22;
+  box-shadow: 0 0 30px #00B4E5;
 }
 
 /* Smooth glow on hover */
