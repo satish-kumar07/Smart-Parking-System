@@ -10,9 +10,10 @@ import SelectSlot from "./pages/SelectSlot";
 import Footer from "./components/Footer";
 import ScanQR from "./pages/ScanQR";
 import GenerateQRCodes from "./pages/GenerateQRCodes";
-// import { AnimatedBackground } from "animated-backgrounds";
+import ChatBot from "./components/ChatBot"; // ✅ Import chatbot component
 
 function App() {
+  // Optional Firestore connection check
   // useEffect(() => {
   //   async function checkDB() {
   //     try {
@@ -26,9 +27,7 @@ function App() {
   // }, []);
 
   return (
-    <div className="bg-gradient-to-br from-[#0A0A0B] via-[#1A1A2E] to-[#16213E]">
-      {/* // <div> */}
-      {/* <AnimatedBackground animationName="starryNight" blendMode="difference" /> */}
+    <div className="relative min-h-screen bg-gradient-to-br from-[#0A0A0B] via-[#1A1A2E] to-[#16213E] text-white">
       <Router>
         <Header />
         <Routes>
@@ -39,6 +38,9 @@ function App() {
           <Route path="/generateqr" element={<GenerateQRCodes />} />
         </Routes>
         <Footer />
+
+        {/* ✅ Floating Chatbot Widget */}
+        <ChatBot />
       </Router>
     </div>
   );

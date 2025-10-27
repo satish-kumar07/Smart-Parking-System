@@ -78,7 +78,10 @@ async def chat(message: ChatMessage) -> Dict[str, str]:
 
     User question: {message.message}
 
-    Keep the reply under 120 words. Be helpful and precise.
+    Keep the reply under 60 words. Be helpful and precise.
+    Provide the best possible answer based on the live data above.
+    Respond in a conversational manner.
+    Don't mention Firebase or technical details and avoid disclaimers.
     """
 
     try:
