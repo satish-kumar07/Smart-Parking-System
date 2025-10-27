@@ -160,60 +160,13 @@ export default function Profile() {
         <h2 className="text-2xl font-bold text-center mb-2">
           Smart Parking Login
         </h2>
-
-        <input
-          type="text"
-          placeholder="Phone number"
-          value={form.phone}
-          onChange={(e) => setForm({ ...form, phone: e.target.value })}
-          className="border border-gray-700 bg-transparent p-2 rounded text-white"
-        />
-
-        <label className="font-medium">Vehicles:</label>
-        {form.vehicles.map((v, idx) => (
-          <div key={idx} className="flex items-center gap-2 mb-1">
-            <input
-              type="text"
-              placeholder={`Vehicle ${idx + 1} Number`}
-              value={v.number}
-              onChange={(e) => {
-                const newVehicles = [...form.vehicles];
-                newVehicles[idx].number = e.target.value;
-                setForm({ ...form, vehicles: newVehicles });
-              }}
-              className="border border-gray-700 bg-transparent p-2 rounded flex-1 text-white"
-            />
-            <select
-              value={v.type}
-              onChange={(e) => {
-                const newVehicles = [...form.vehicles];
-                newVehicles[idx].type = e.target.value;
-                setForm({ ...form, vehicles: newVehicles });
-              }}
-              className="border border-gray-700 bg-transparent p-2 rounded text-white"
-            >
-              <option value="2-wheeler">2 Wheeler</option>
-              <option value="3-wheeler">3 Wheeler</option>
-              <option value="4-wheeler">4 Wheeler</option>
-            </select>
-          </div>
-        ))}
-
-        <button
-          onClick={() =>
-            setForm({
-              ...form,
-              vehicles: [...form.vehicles, { number: "", type: "2-wheeler" }],
-            })
-          }
-          className="underline text-sm"
-        >
-          + Add another vehicle
-        </button>
+        <p className="text-center text-gray-400">
+          Sign in with Google to access your profile and manage your parking.
+        </p>
 
         <button
           onClick={() => loginWithGoogle(form)}
-          className="bg-green-600 text-white p-2 rounded mt-3 hover:bg-green-700 flex items-center justify-center space-x-2"
+          className="bg-[#00D4AA] text-white p-2 rounded mt-3 hover:bg-[#00D4AA] flex items-center justify-center space-x-2"
         >
           <IoMdLogIn size={20} />
           <span>Sign in with Google</span>
