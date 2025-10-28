@@ -119,7 +119,7 @@ export default function SelectSlot() {
         <select
           onChange={(e) => setSelectedLot(e.target.value)}
           value={selectedLot || ""}
-          className="bg-black border border-black p-3 rounded-xl w-full text-white focus:outline-none focus:ring-2 focus:ring-[#00D4AA]"
+          className="bg-black border-10 border-black p-3 rounded-xl w-full text-white focus:outline-none focus:ring-2 focus:ring-[#00D4AA]"
         >
           <option value="">Parking Lots</option>
           {lots.map((lot) => (
@@ -136,7 +136,6 @@ export default function SelectSlot() {
           <FaTrafficLight />
           Live Sensor Data
         </h3>
-
         {/* Color Legend */}
         <div className="flex justify-center gap-6 mb-5 text-sm text-gray-300">
           <div className="flex items-center gap-2">
@@ -148,7 +147,6 @@ export default function SelectSlot() {
             Occupied
           </div>
         </div>
-
         {/* Parking Grid Visualization */}
         <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-4 mb-8 justify-items-center mx-auto max-w-4xl">
           {Object.entries(iotSlots).map(([key, slot], i) => {

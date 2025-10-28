@@ -66,8 +66,6 @@ async def chat(message: ChatMessage) -> Dict[str, str]:
     {firebase_data}
 
     The user might ask about:
-    - Free or occupied slots
-    - EV charging availability
     - Parking for 2/3/4 wheelers
     - Where to go or how to park
     - Pricing or smart allocation
@@ -82,6 +80,7 @@ async def chat(message: ChatMessage) -> Dict[str, str]:
     Provide the best possible answer based on the live data above.
     Respond in a conversational manner.
     Don't mention Firebase or technical details and avoid disclaimers.
+    don't say distance and iot output data.
     """
 
     try:
