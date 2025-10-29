@@ -6,7 +6,9 @@
 #define WIFI_PASSWORD ""
 
 // Firebase Realtime Database URL
-#define DATABASE_URL "" // e.g., "https://your-database-name.firebaseio.com"
+// e.g., "https://your-database-name.firebaseio.com"
+
+#define DATABASE_URL "" 
 
 // Ultrasonic Sensor Pins (for 5 slots)
 #define TRIG1 12
