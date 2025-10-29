@@ -71,7 +71,7 @@ export default function SelectSlot() {
     setTimeout(() => setAnimationVisible(true), 300);
   }, []);
 
-  // 🚗 Toggle slot booking/unbooking (Firestore)
+  // Toggle slot booking/unbooking (Firestore)
   const handleToggleSlot = async (slotId, rate, isBooked) => {
     if (!user) return alert("Please login first.");
     setLoading(true);
