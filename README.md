@@ -165,9 +165,9 @@ Once both modules are active:
 ## 👥 Project Owners & License
 
 ### Project Team
-- **Prajapati Satish Kumar** - _Lead Developer_
-- **Ram gopal Reddy** - _ML/AI Engineer_
-- **Abhinav Dasari** - _Frontend/IoT Developer_
+- **Prajapati Satish Kumar**
+- **Ram gopal Reddy**
+- **Abhinav Dasari**
 
 ### License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
@@ -183,4 +183,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 This README was added/updated to provide setup, deployment, and contribution guidance for the Smart Parking app. Adjust any Firebase or environment values before sharing the repo publicly.
+
 
